@@ -1,0 +1,191 @@
+body {
+  text-align: center;
+  margin: 0;
+}
+
+h1 {
+  font-family: "Raleway", Helvetica;
+  color: #0D2C40;
+  letter-spacing: 1px;
+  font-weight: 400;
+  font-size: 45px;
+  margin: 0;
+}
+
+h2 {
+  font-family: "Raleway", Helvetica;
+  color: #F15B31;
+  letter-spacing: 1px;
+  font-weight: 600;
+  font-size: 18px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+h3 {
+  font-family: "Raleway", Helvetica;
+  color: #0D2C40;
+  letter-spacing: 1px;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+p {
+  font-family: "Droid Serif", sans-serif;
+}
+
+header {
+  background: #F15B31;
+  padding: 30px 20px;
+}
+
+nav {
+  background: #00A6B3;
+  padding: 20px 0;
+}
+
+nav a {
+  margin: 0 20px;
+}
+
+main {
+  width: 850px;
+  margin: 35px auto;
+}
+
+footer {
+  text-transform: uppercase;
+  padding: 0 20px;
+  background: #0D2C40;
+  color: white;
+  font-size: 14px;
+  letter-spacing: .08em;
+  font-weight: 500;
+}
+
+img {
+  margin: 40px 8px;
+}
+
+a {
+  border-bottom: 2px solid transparent;
+}
+
+.copyright {
+  font-family: "Raleway", Helvetica;
+  float: left;
+}
+
+.message {
+  font-family: "Raleway", Helvetica;
+  float: right;
+}
+
+.name {
+  color: #F15B31;
+  font-weight: 700;
+}
+
+.link {
+  font-family: "Raleway", Helvetica;
+  color: white;
+  font-size: 16px;
+  text-transform: uppercase;
+  text-decoration: none;
+
+
+}
+
+a:hover {
+  border-color: white;
+}
+
+.clearfix:after {
+  visibility: hidden;
+  display: block;
+  content: " ";
+  clear: both;
+  height: 0;
+  font-size: 0;
+}
+
+.card {
+    cursor: pointer;
+}
+
+#controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#controls p {
+    text-transform: uppercase;
+    font-family: Helvetica;
+    font-weight: bold;
+    color: #555;
+    padding:0px 8px;
+}
+
+#reset {
+    border: 3px solid white;
+    border-radius: 6px;
+    font-size: 14px;
+    color: white;
+    font-family: Helvetica;
+    font-weight: bold;
+    padding: 12px;
+    cursor: pointer;
+    background: #FF4136;
+    transition: background .3s ease-in, border-color .3s ease-in, color .3s ease-in;
+}
+
+#reset:hover {
+    background: transparent;
+    border-color: #FF4136;
+    color: #FF4136;
+}
+
+#score {
+    padding: 12px;
+    color: white;
+    background: #2ECC40;
+    border-radius: 6px;
+}
+
+#message {
+    width: 30%;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    font-family: "Raleway", Helvetica;
+    font-size: 16px;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.flash {
+    animation-name: flash;
+    animation-duration: 160ms;
+    animation-timing-function: cubic-bezier(0.000, 1.275, 0.095, 0.830);
+    animation-iteration-count: 2;
+}
+
+@keyframes flash {
+    0% {
+        background: transparent;
+    }
+    
+    50% {
+        background: #efefef;
+    }
+    
+    100% {
+        background: transparent;
+    } 
+}
+
+
+
