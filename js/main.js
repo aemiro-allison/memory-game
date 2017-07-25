@@ -1,45 +1,55 @@
 var cards = [{
-    rank: "queen",
-    suit: "hearts",
-    cardImage: "images/queen-of-hearts.png"
+    rank: 'queen',
+    suit: 'hearts',
+    cardImage: 'images/queen-of-hearts.png'
 }, {
-    rank: "queen",
-    suit: "diamonds",
-    cardImage: "images/queen-of-diamonds.png"
+    rank: 'queen',
+    suit: 'diamonds',
+    cardImage: 'images/queen-of-diamonds.png'
 }, {
-    rank: "king",
-    suit: "hearts",
-    cardImage: "images/king-of-hearts.png"
+    rank: 'king',
+    suit: 'hearts',
+    cardImage: 'images/king-of-hearts.png'
 }, {
-    rank: "king",
-    suit: "diamonds",
-    cardImage: "images/king-of-diamonds.png"
+    rank: 'king',
+    suit: 'diamonds',
+    cardImage: 'images/king-of-diamonds.png'
 }];
 
 var cardsInPlay = [];
 var gameBoard   = document.getElementById('game-board');
 var message     = document.getElementById('message');
 var score       = document.getElementById('score');
+var tries       = document.getElementById('tries');
 score.innerText = 0;
+tries.innerText = 0;
 
+var animateBoard = function(isMatch) {
+
+	if(isMatch) {
+		message.style.background = '#2ECC40';
+		message.innerText = 'Great! You found a match!';
+
+    // reset game-board after 1.5s and udapate score
+		setTimeout(function() {
+			score.innerText = +score.innerText + 1;
+			clearBoard();
+		}, 1500);
+	} else {
+		message.style.background = '#FF4136';
+		message.innerText = 'Sorry, try again...';
+
+    // reset game-board after 1.1s
+		setTimeout(clearBoard, 1100);
+	}
+
+  tries.innerText = +tries.innerText + 1;
+}
 
 var checkForMatch = function() {
-    if (cardsInPlay[0].rank === cardsInPlay[1].rank) {
-        message.style.background = "#2ECC40";
-        message.innerText = "Great! You found a match!";
-        
-        setTimeout(function() {
-            score.innerText = parseInt(score.innerText) + 1;
-            clearBoard();
-        }, 1500);
-    } else {
-        message.style.background = "#FF4136";
-        message.innerText = "Sorry, try again...";
-        
-        setTimeout(function() {
-            clearBoard();
-        }, 1100);
-    }   
+    var isMatch = (cardsInPlay[0].rank === cardsInPlay[1].rank);
+    // display a message whether there is a match or not and update scores
+		animateBoard(isMatch);
 }
 
 var flipCard = function() {
@@ -49,7 +59,7 @@ var flipCard = function() {
     }
     var cardId = this.getAttribute('data-id');
     // put clicked card in clicked cards that are in play.
-    cardsInPlay.push({ rank: cards[cardId].rank, cardImage: cards[cardId].cardImage }); 
+    cardsInPlay.push({ rank: cards[cardId].rank, cardImage: cards[cardId].cardImage });
     // reveal the image of the card when it is clicked.
     this.setAttribute('src', cards[cardId].cardImage);
     // if there are two cards clicked, check if they match
@@ -59,9 +69,12 @@ var flipCard = function() {
 }
 
 var randomize = function(cardPack) {
+    let arr = [];
+
     // Kris Selbekk Apr 5, 2017 - randomize array
     // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
     cardPack.sort(function() { return Math.random() * 2 - 1 });
+
 }
 
 var createBoard = function() {
@@ -71,19 +84,19 @@ var createBoard = function() {
     // create the images and add to teh game board
     for(var i = 0; i < cards.length; i++) {
         var cardElement = document.createElement('img');
-        
+
         cardElement.setAttribute('src', 'images/back.png');
         cardElement.setAttribute('data-id', i);
         cardElement.setAttribute('class', 'card');
-        
+
         cardElement.addEventListener('click', flipCard);
         gameBoard.appendChild(cardElement);
     }
-    
+
     //remove the flash class after 1 second to clean up HTML.
     setTimeout(function() {
         gameBoard.classList.remove('flash');
-    }, 1000);
+    }, 3000);
 }
 
 var clearBoard = function() {
@@ -99,7 +112,7 @@ var clearBoard = function() {
 
 var resetButton = document.getElementById('reset');
 resetButton.addEventListener('click', function() {
-   clearBoard(); 
+   clearBoard();
 });
 
 createBoard();
