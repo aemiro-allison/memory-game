@@ -1,122 +1,139 @@
-var cards = [{
-    rank: 'queen',
-    suit: 'hearts',
-    cardImage: 'images/queen-of-hearts.png'
+const cards = [{
+    rank: "queen",
+    suit: "hearts",
+    cardImage: "images/queen-of-hearts.png"
 }, {
-    rank: 'queen',
-    suit: 'diamonds',
-    cardImage: 'images/queen-of-diamonds.png'
+    rank: "queen",
+    suit: "diamonds",
+    cardImage: "images/queen-of-diamonds.png"
 }, {
-    rank: 'king',
-    suit: 'hearts',
-    cardImage: 'images/king-of-hearts.png'
+    rank: "king",
+    suit: "hearts",
+    cardImage: "images/king-of-hearts.png"
 }, {
-    rank: 'king',
-    suit: 'diamonds',
-    cardImage: 'images/king-of-diamonds.png'
+    rank: "king",
+    suit: "diamonds",
+    cardImage: "images/king-of-diamonds.png"
 }];
 
-var cardsInPlay = [];
-var gameBoard   = document.getElementById('game-board');
-var message     = document.getElementById('message');
-var score       = document.getElementById('score');
-var tries       = document.getElementById('tries');
-score.innerText = 0;
-tries.innerText = 0;
+document.addEventListener('DOMContentLoaded', () => {
+	let memoryGame = new cardGame(
+		document.getElementById('game-board'),
+		document.getElementById('message'),
+		cards,
+	);
 
-var animateBoard = function(isMatch) {
-
-	if(isMatch) {
-		message.style.background = '#2ECC40';
-		message.innerText = 'Great! You found a match!';
-
-    // reset game-board after 1.5s and udapate score
-		setTimeout(function() {
-			score.innerText = +score.innerText + 1;
-			clearBoard();
-		}, 1500);
-	} else {
-		message.style.background = '#FF4136';
-		message.innerText = 'Sorry, try again...';
-
-    // reset game-board after 1.1s
-		setTimeout(clearBoard, 1100);
-	}
-
-  tries.innerText = +tries.innerText + 1;
-}
-
-var checkForMatch = function() {
-    var isMatch = (cardsInPlay[0].rank === cardsInPlay[1].rank);
-    // display a message whether there is a match or not and update scores
-		animateBoard(isMatch);
-}
-
-var flipCard = function() {
-    // stop multiple clicks on same card.
-    if(cardsInPlay[0]) {
-        if(this.getAttribute('src') === cardsInPlay[0].cardImage) return;
-    }
-    var cardId = this.getAttribute('data-id');
-    // put clicked card in clicked cards that are in play.
-    cardsInPlay.push({ rank: cards[cardId].rank, cardImage: cards[cardId].cardImage });
-    // reveal the image of the card when it is clicked.
-    this.setAttribute('src', cards[cardId].cardImage);
-    // if there are two cards clicked, check if they match
-    if(cardsInPlay.length > 1) {
-        checkForMatch();
-    }
-}
-
-var randomize = function(cardPack) {
-    let arr = [];
-
-    // Kris Selbekk Apr 5, 2017 - randomize array
-    // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-    cardPack.sort(function() { return Math.random() * 2 - 1 });
-
-}
-
-var createBoard = function() {
-    randomize(cards);
-    // add flash class to flash the game board when it is reset.
-    gameBoard.classList.add('flash');
-    // create the images and add to teh game board
-    for(var i = 0; i < cards.length; i++) {
-        var cardElement = document.createElement('img');
-
-        cardElement.setAttribute('src', 'images/back.png');
-        cardElement.setAttribute('data-id', i);
-        cardElement.setAttribute('class', 'card');
-
-        cardElement.addEventListener('click', flipCard);
-        gameBoard.appendChild(cardElement);
-    }
-
-    //remove the flash class after 1 second to clean up HTML.
-    setTimeout(function() {
-        gameBoard.classList.remove('flash');
-    }, 3000);
-}
-
-var clearBoard = function() {
-    // delete all the cards;
-    document.getElementById('game-board').innerHTML = '';
-    message.innerText = '';
-    message.style.background = "inherit";
-    //reset cards that have been flipped
-    cardsInPlay = [];
-    //create new board
-    createBoard();
-}
-
-var resetButton = document.getElementById('reset');
-resetButton.addEventListener('click', function() {
-   clearBoard();
+	memoryGame.start();
 });
 
-createBoard();
+class cardGame {
+	constructor($board, $message, cards) {
+		this.state = {
+			gameBoard: $board,
+			message: $message,
+			score: document.getElementById('score'),
+			cards,
+			game: '',
+			cardsInPlay: [],
+			guesses: {
+				attempts: 0,
+				correct: 0,
+				incorrect: 0,
+			},
+		};
 
+		this.cardHandler = this.cardHandler.bind(this);
+		this.reset = this.reset.bind(this);
+		this.animate = this.animate.bind(this);
+		this.display = this.display.bind(this);
+		this.create = this.create.bind(this);
+	}
 
+	//fill board with cards
+	start() {
+		this.animate('flash');
+		this.randomize(this.state.cards);
+		this.create(this.state.cards);
+	}
 
+	create(cards) {
+		cards.map((card, i) => {
+			let cardElement = document.createElement('img');
+			cardElement.setAttribute('src', 'images/back.png');
+      cardElement.setAttribute('data-id', i);
+      cardElement.setAttribute('class', 'card');
+      cardElement.setAttribute('data-clicked', 0);
 
+			cardElement.addEventListener('click', this.cardHandler);
+			this.state.gameBoard.appendChild(cardElement);
+		});
+	}
+
+	update(cardId, card) {
+		if (this.state.cardsInPlay.length === 1 && this.isMatch(card)) {
+
+			this.display('You have won');
+			this.state.guesses.attempts+=1;
+			this.state.guesses.correct+=1;
+			let { incorrect, correct, attempts } = this.state.guesses;
+			this.state.score.innerText = `$Attempts: ${attempts}		||		Wins: ${correct}		||		Fails: ${incorrect}`;
+			setTimeout(this.reset, 2000);
+		} else if (this.state.cardsInPlay.length === 1) {
+
+			this.display('You lost');
+			this.state.guesses.attempts+=1;
+			this.state.guesses.incorrect+=1;
+			let { incorrect, correct, attempts } = this.state.guesses;
+			this.state.score.innerText = `$Attempts: ${attempts}		||		Wins: ${correct}		||		Fails: ${incorrect}`;
+			setTimeout(this.reset, 2000);
+		} else {
+			// put clicked card in clicked cards that are in play.
+			this.state.cardsInPlay.push({
+				rank: cards[cardId].rank,
+				cardImage: this.state.cards[cardId].cardImage,
+			});
+		}
+	}
+
+	end() {
+		this.state.gameBoard.innerHTML = '';
+    this.state.cardsInPlay = [];
+    this.state.message.innerText = '';
+	}
+
+	reset() {
+		this.end();
+		this.start();
+	}
+
+	animate(className) {
+		this.state.gameBoard.classList.add(className);
+		setTimeout(() => this.state.gameBoard.classList.remove(className), 1500);
+	}
+
+	display(msg) {
+		this.state.message.innerText = msg;
+	}
+  // check if there is match
+	isMatch(card) {
+		return this.state.cardsInPlay[0].rank === card.rank;
+	}
+
+	// Kris Selbekk Apr 5, 2017 - randomize array
+  // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+	randomize(cards) {
+    cards.sort(function() { return Math.random() * 2 - 1 });
+	}
+
+	cardHandler(evt) {
+		const cardId = evt.target.getAttribute('data-id');
+		const isFlipped = !!Number(evt.target.getAttribute('data-clicked'));
+		if (!isFlipped) {
+			// reveal the image of the card when it is clicked.
+			evt.target.setAttribute('src', cards[cardId].cardImage);
+			evt.target.setAttribute('data-clicked', 1);
+			this.update(cardId, this.state.cards[cardId]);
+		}
+	}
+
+}
