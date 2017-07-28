@@ -48,7 +48,6 @@ class cardGame {
 
 	// fill board with cards
 	start() {
-    this.state.score.innerText = 'Attempts:  0  ||  Wins: 0 ||  Fails: 0';
     this.animate(this.state.gameBoard, 'flash');
 		this.randomize(this.state.cards);
 		this.create(this.state.cards);
