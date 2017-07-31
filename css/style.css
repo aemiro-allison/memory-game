@@ -1,7 +1,35 @@
+html {
+  height: 100%;
+  font-family: 'Raleway', san-serif;
+}
+
 body {
 	margin: 0;
-	height: 100%;
+	overflow: hidden;
 	width: 100%;
+  color: #222;
+  background: url('https://ak8.picdn.net/shutterstock/videos/7223614/thumb/6.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  /*background-image: linear-gradient(to right, #434343 0%, black 100%);*/
+  /*background-image: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);*/
+  background: #fff;
+}
+
+#wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  /*box-shadow: 0px 0px 70px 9px rgba(0,0,0,0.26);*/
+  margin: calc(100%/15) 0;
+  padding: 5% 0;
+  height: 80%;
+}
+
+h1 {
+  font-family: 'Helvetica';
+  font-weight: bold;
+  text-align: center;
 }
 
 main {
@@ -10,7 +38,6 @@ main {
 	align-items: center;
 	flex-direction: column;
 	box-sizing: border-box;
-	margin: 15% auto;
 }
 
 /*#message {
@@ -24,7 +51,6 @@ main {
   flex-direction: row;
   justify-content: space-between;
   height: auto;
-  z-index: 1;
 }
 
 
@@ -33,6 +59,7 @@ main {
   margin: 1%;
   position: relative;
   perspective: 800;
+  opacity: 0.9;
 }
 
 .card-body {
@@ -46,10 +73,16 @@ main {
   /*backface-visibility: hidden;*/
   top:0;
   left:0;
+  background: transparent;
+}
+
+img {
+  border-radius: 4px;
 }
 
 .card-body .front {
   z-index: 0;
+  cursor: pointer;
 }
 
 .card-body img.back {
@@ -65,7 +98,52 @@ main {
   animation-timing-function: cubic-bezier(.35,0,.48,1);
   animation-iteration-count: 1;
   transform: rotateY( 180deg ) scale(1.06);
-  box-shadow: 0px 4px 60px 2px rgba(0,0,0,0.2);
+  background: transparent;
+}
+
+#card-image1  img {
+  display: block;
+  position: absolute;
+  bottom: 10%;
+  right: 0;
+  opacity: 0.8;
+  transform: rotate(-30deg) translateX(100px);
+  z-index: -1;
+}
+
+#card-image2 img {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.8;
+  transform: rotate(180deg) translateX(-20%) translate();
+}
+
+#score {
+  min-width: 400px;
+  margin: 2%;
+  height: 10%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#score span {
+  display: inline-block;
+  padding: 12px;
+  background: #444;
+  color: #fff;
+  text-align: center;
+  width: 25%;
+  font-family: 'Arial';
+  border-radius: 4px;
+}
+
+#message {
+  font-size: 1rem;
+  font-weight: bold;
+  color: redl;
 }
 
 .flash {
@@ -97,7 +175,9 @@ main {
   }
 
   100% {
-  transform: rotateY(180deg);
-  box-shadow: 0px 4px 60px 2px rgba(0,0,0,0.2);
+    transform: rotateY(180deg);
+    box-shadow: 0px 20px 80px 4px rgba(98,98,115,0.3);
   }
 }
+
+

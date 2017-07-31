@@ -51,6 +51,7 @@ class cardGame {
     this.animate(this.state.gameBoard, 'flash');
 		this.randomize(this.state.cards);
 		this.create(this.state.cards);
+    this.updateScore(this.state.guesses);
 	}
 
 	create(cards) {
@@ -62,7 +63,7 @@ class cardGame {
       cardElementFront.setAttribute('data-id', i);
       cardElementFront.setAttribute('class', 'front card');
       cardElementFront.setAttribute('data-clicked', 0);
-			cardElementFront.addEventListener('click', this.cardHandler);
+
       // reveal the image of the card when it is clicked.
       cardElementBack.setAttribute('src', card.cardImage);
       cardElementBack.setAttribute('class', 'back');
@@ -76,6 +77,7 @@ class cardGame {
 
       let cardBody = document.createElement('div');
       cardBody.setAttribute('class', 'card-body');
+      cardBody.addEventListener('click', this.cardHandler);
 
       cardBody.appendChild(docFrag);
       cardContainer.appendChild(cardBody);
@@ -122,24 +124,29 @@ class cardGame {
     cards.sort(function() { return Math.random() * 2 - 1 });
   }
 
+  updateScore(guesses) {
+    this.state.score.innerHTML = `
+      <span>Attempts: ${guesses.attempts}</span>
+      <span>Wins: ${guesses.correct}</span>
+    `;
+  }
+
 	update(cardId, card) {
 		if (this.state.cardsInPlay.length === 1 && this.isMatch(card)) {
 
 			this.display('You have won');
 			this.state.guesses.attempts+=1;
 			this.state.guesses.correct+=1;
-			let { incorrect, correct, attempts } = this.state.guesses;
       this.state.isGameOver = true;
-			this.state.score.innerText = `Attempts: ${attempts}		||		Wins: ${correct}		||		Fails: ${incorrect}`;
+      this.updateScore(this.state.guesses);
 			setTimeout(this.reset, 2000);
 		} else if (this.state.cardsInPlay.length === 1) {
 
 			this.display('You lost');
 			this.state.guesses.attempts+=1;
 			this.state.guesses.incorrect+=1;
-			let { incorrect, correct, attempts } = this.state.guesses;
       this.state.isGameOver = true;
-			this.state.score.innerText = `Attempts: ${attempts}		||		Wins: ${correct}		||		Fails: ${incorrect}`;
+      this.updateScore(this.state.guesses);
 			setTimeout(this.reset, 2000);
 		} else {
 			// put clicked card in clicked cards that are in play.
@@ -151,13 +158,22 @@ class cardGame {
 	}
 
 	cardHandler(evt) {
-		const cardId = evt.target.getAttribute('data-id');
-		const isFlipped = !!Number(evt.target.getAttribute('data-clicked'));
-		if (!isFlipped && !this.state.isGameOver) {
-      evt.target.setAttribute('data-clicked', 1);
-			this.update(cardId, this.state.cards[cardId]);
-      this.animate(evt.target.parentNode, 'flipped', false);
-		}
+    if (evt.target.getAttribute('class') === 'back') {
+      const cardId = evt.target.previousSibling.getAttribute('data-id');
+      const isFlipped = !!Number(evt.target.previousSibling.getAttribute('data-clicked'));
+      if (!isFlipped && !this.state.isGameOver) {
+        evt.target.previousSibling.setAttribute('data-clicked', 1);
+        this.update(cardId, this.state.cards[cardId]);
+        this.animate(evt.target.previousSibling.parentNode, 'flipped', false);
+      }
+    } else {
+      const cardId = evt.target.getAttribute('data-id');
+      const isFlipped = !!Number(evt.target.getAttribute('data-clicked'));
+      if (!isFlipped && !this.state.isGameOver) {
+        evt.target.setAttribute('data-clicked', 1);
+        this.update(cardId, this.state.cards[cardId]);
+        this.animate(evt.target.parentNode, 'flipped', false);
+      }
+      }
 	}
-
 }
