@@ -16,164 +16,154 @@ const cards = [{
     cardImage: "images/king-of-diamonds.png"
 }];
 
-document.addEventListener('DOMContentLoaded', () => {
-	let memoryGame = new cardGame(cards, {
-    board: document.getElementById('game-board'),
-    message: document.getElementById('message'),
-    score: document.getElementById('score'),
-  });
+class Card {
+  constructor(card, {rank, cardImage}) {
+    this.rank = rank;
+    this.cardImage = cardImage;
+    this.card = card;
+    this.clicked = false;
 
-	memoryGame.start();
-});
-
-class cardGame {
-	constructor(cards, $els) {
-		this.state = {
-			gameBoard: $els.board,
-			message: $els.message,
-			score: $els.score,
-			cards,
-			isGameOver: false,
-			cardsInPlay: [],
-			guesses: {
-				attempts: 0,
-				correct: 0,
-				incorrect: 0,
-			},
-		};
-
-		this.cardHandler = this.cardHandler.bind(this);
-    this.reset = this.reset.bind(this);
-	}
-
-	// fill board with cards
-	start() {
-    this.animate(this.state.gameBoard, 'flash');
-		this.randomize(this.state.cards);
-		this.create(this.state.cards);
-    this.updateScore(this.state.guesses);
-	}
-
-	create(cards) {
-		cards.map((card, i) => {
-      let cardElementFront = document.createElement('img');
-			let cardElementBack = document.createElement('img');
-
-			cardElementFront.setAttribute('src', 'images/back.png');
-      cardElementFront.setAttribute('data-id', i);
-      cardElementFront.setAttribute('class', 'front card');
-      cardElementFront.setAttribute('data-clicked', 0);
-
-      // reveal the image of the card when it is clicked.
-      cardElementBack.setAttribute('src', card.cardImage);
-      cardElementBack.setAttribute('class', 'back');
-
-      const docFrag = document.createDocumentFragment();
-      docFrag.appendChild(cardElementFront);
-      docFrag.appendChild(cardElementBack);
-
-      let cardContainer = document.createElement('div');
-      cardContainer.setAttribute('class', 'container');
-
-      let cardBody = document.createElement('div');
-      cardBody.setAttribute('class', 'card-body');
-      cardBody.addEventListener('click', this.cardHandler);
-
-      cardBody.appendChild(docFrag);
-      cardContainer.appendChild(cardBody);
-			this.state.gameBoard.appendChild(cardContainer);
-		});
-	}
-
-  end() {
-    this.state.gameBoard.innerHTML = '';
-    this.state.cardsInPlay = [];
-    this.state.message.style.visibility = 'hidden';
-    this.state.message.innerText = 'placeholder';
+    this.card.addEventListener('click', this.handleClick.bind(this));
   }
 
-  reset() {
-    this.state.isGameOver = false;
-    this.end();
-    this.start();
-  }
-
-  display(msg) {
-    this.state.message.innerText = msg;
-    this.state.message.style.visibility = 'visible';
-  }
-
-  animate(el, className, toggle = true) {
-    el.classList.add(className);
-    if(toggle) {
-        el.addEventListener('animationend', () => {
-        el.classList.remove(className);
-        el.removeEventListener('animationend', this.cardHandler);
-      });
+  handleClick(evt) {
+    if (this.clicked === false) {
+      this.setClicked(true);
+      this.flip();
     }
   }
 
-  // check if there is match
-  isMatch(card) {
-    return this.state.cardsInPlay[0].rank === card.rank;
+  getRank() {
+    return this.rank;
   }
 
-  // Kris Selbekk Apr 5, 2017 - randomize array
-  // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-  randomize(cards) {
-    cards.sort(function() { return Math.random() * 2 - 1 });
+  getClicked() {
+    return this.clicked;
   }
 
-  updateScore(guesses) {
-    this.state.score.innerHTML = `
+  setClicked(value) {
+    this.clicked = value;
+  }
+
+  flip() {
+    animate(this.card, 'flipped', false);
+  }
+}
+
+class Board {
+  constructor(els) {
+    this.els = els;
+    this.cards = [];
+    this.reset = this.reset.bind(this);
+  }
+
+  getCards() {
+    return this.cards;
+  }
+
+  createCard(card, i) {
+      return pipe(
+        appendNode('div',{'class': 'container'}),
+        appendNode('div', { 'class': 'card-body'}),
+      )(this.els.board);
+  }
+
+  init(cards) {
+    this.cards = [];
+    let cardBody;
+    this.update({attempts:0, correct:0});
+    cards.forEach((card, i) => {
+      let cardBody = this.createCard(card, i);
+      appendNode('img', {
+        'class': 'front card',
+        'src': 'images/back.png',
+        'data-id': i,
+      })(cardBody);
+
+      appendNode('img', {
+        'class': 'back',
+        'data-rank': card.rank,
+        'src': card.cardImage,
+      })(cardBody);
+
+      this.cards.push(new Card(cardBody, card));
+    });
+    animate(this.els.board, 'flash');
+  }
+
+  update(guesses) {
+    this.els.score.innerHTML = `
       <span>Attempts: ${guesses.attempts}</span>
       <span>Wins: ${guesses.correct}</span>
     `;
   }
 
-	update(cardId, card) {
-		if (this.state.cardsInPlay.length === 1 && this.isMatch(card)) {
-
-			this.display('You have won');
-			this.state.guesses.attempts+=1;
-			this.state.guesses.correct+=1;
-      this.state.isGameOver = true;
-      this.updateScore(this.state.guesses);
-			setTimeout(this.reset, 2000);
-		} else if (this.state.cardsInPlay.length === 1) {
-
-			this.display('You lost');
-			this.state.guesses.attempts+=1;
-			this.state.guesses.incorrect+=1;
-      this.state.isGameOver = true;
-      this.updateScore(this.state.guesses);
-			setTimeout(this.reset, 2000);
-		} else {
-			// put clicked card in clicked cards that are in play.
-			this.state.cardsInPlay.push({
-				rank: cards[cardId].rank,
-				cardImage: this.state.cards[cardId].cardImage,
-			});
-		}
-	}
-
-	cardHandler(evt) {
-    if (evt.target.getAttribute('class') === 'back') {
-      const cardId = evt.target.previousSibling.getAttribute('data-id');
-      const isFlipped = !!Number(evt.target.previousSibling.getAttribute('data-clicked'));
-      if (!isFlipped && !this.state.isGameOver) {
-        evt.target.previousSibling.setAttribute('data-clicked', 1);
-        this.update(cardId, this.state.cards[cardId]);
-        this.animate(evt.target.previousSibling.parentNode, 'flipped', false);
-      }
-    } else {
-      const cardId = evt.target.getAttribute('data-id');
-      const isFlipped = !!Number(evt.target.getAttribute('data-clicked'));
-      if (!isFlipped && !this.state.isGameOver) {
-        evt.target.setAttribute('data-clicked', 1);
-        this.update(cardId, this.state.cards[cardId]);
-        this.animate(evt.target.parentNode, 'flipped', false);
-      }
-      }
-	}
+  reset() {
+    // implement board reset.
+    this.els.board.innerHTML = '';
+    this.init(cards);
+    this.els.message.textContent = 'Welcome to Memory Game';
+  }
 }
+
+class Game {
+  constructor(board) {
+    this.cards = board.cards;
+    this.board = board;
+    this.guesses = {
+      correct: 0,
+      incorrect: 0,
+      attempts: 0,
+    };
+
+    this.board.els.board.addEventListener('click', this.checkForMatch.bind(this));
+    this.reset = this.reset.bind(this);
+  }
+
+  checkForMatch(evt) {
+    console.log('check for match ran!');
+    let clickedCards = this.cards.filter(card => card.getClicked());
+    if (clickedCards.length !== 2) return;
+    if (clickedCards.length === 2) this.guesses.attempts+=1;
+    if (clickedCards[0].getRank() === clickedCards[1].getRank()) {
+      this.display('you found a match.');
+      this.guesses.correct+=1;
+      this.update(this.guesses);
+      this.reset();
+    } else {
+      this.guesses.incorrect+=1;
+      this.display('sorry, better luck next time');
+      this.update(this.guesses);
+      this.reset();
+    }
+  }
+
+  display(msg) {
+    this.board.els.message.textContent = msg;
+  }
+
+  update() {
+    this.board.update(this.guesses);
+  }
+
+  reset() {
+    setTimeout(() => {
+      this.board.reset();
+      this.cards = this.board.getCards();
+      console.log(this.cards);
+    },2000);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const els = {
+    board: document.getElementById('game-board'),
+    message: document.getElementById('message'),
+    score: document.getElementById('score'),
+  };
+
+  const board = new Board(els);
+  board.init(cards);
+
+  const game = new Game(board);
+});

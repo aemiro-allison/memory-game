@@ -40,10 +40,6 @@ main {
 	box-sizing: border-box;
 }
 
-/*#message {
-  visibility: hidden;
-}*/
-
 #game-board {
 	padding: 12px;
   min-width: 800px;
@@ -70,7 +66,6 @@ main {
 
 .card-body img.card {
   position: absolute;
-  /*backface-visibility: hidden;*/
   top:0;
   left:0;
   background: transparent;
@@ -144,6 +139,7 @@ img {
   font-size: 1rem;
   font-weight: bold;
   color: redl;
+  height: 10%;
 }
 
 .flash {
