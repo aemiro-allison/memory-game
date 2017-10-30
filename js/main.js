@@ -68,11 +68,11 @@ class Board {
       )(this.els.board);
   }
 
-  init(cards) {
+  init(sortedCards) {
     this.cards = [];
     let cardBody;
-    this.update({attempts:0, correct:0});
-    cards.forEach((card, i) => {
+    // this.update({attempts:0, correct:0});
+    sortedCards.forEach((card, i) => {
       let cardBody = this.createCard(card, i);
       appendNode('img', {
         'class': 'front card',
@@ -101,7 +101,7 @@ class Board {
   reset() {
     // implement board reset.
     this.els.board.innerHTML = '';
-    this.init(cards);
+    this.init(randomize(cards));
     this.els.message.textContent = 'Welcome to Memory Game';
   }
 }
